@@ -1,0 +1,57 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:controls="clr-namespace:tokenizingtextbox">
+
+    <!--  Default style for TokenizingTextBox  -->
+    <Style TargetType="controls:TokenizingTextBox">
+        <Setter Property="IsTabStop"
+                Value="False" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:TokenizingTextBox">
+                    <Border Name="Border"
+                            CornerRadius="2"
+                            BorderThickness="0,0,0,1"
+                            Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"
+                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+
+                        <controls:WrapPanel x:Name="PART_WrapPanel"
+                                            Margin="5"
+                                            HorizontalSpacing="5"
+                                            StretchChild="Last">
+
+                            <!--  Token items go here  -->
+
+                            <TextBox Name="PART_TextBox"
+                                     Text="{TemplateBinding Text}"
+                                     BorderThickness="0,0,0,1"
+                                     Padding="0,2"
+                                     VerticalContentAlignment="Center"
+                                     MinHeight="25" />
+                        </controls:WrapPanel>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Disabled" />
+                                <VisualState x:Name="Normal" />
+                                <!--
+                                    either highlight textbox (last child) or any of the tags
+                                    no styling required here.
+                                -->
+                                <VisualState x:Name="MouseOver" />
+                            </VisualStateGroup>
+
+                            <VisualStateGroup x:Name="FocusStates">
+                                <!-- Keyboard Focus (not focusable) -->
+                                <VisualState x:Name="Focused" />
+                                <VisualState x:Name="Unfocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
