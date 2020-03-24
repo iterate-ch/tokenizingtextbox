@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>
-      net48;netcoreapp3.1
+      net4;net45;net47;net48;netcoreapp3.1
     </TargetFrameworks>
     <UseWPF>true</UseWPF>
     <Authors>iterate GmbH</Authors>
