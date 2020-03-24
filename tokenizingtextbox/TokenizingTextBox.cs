@@ -424,7 +424,7 @@ namespace tokenizingtextbox
             {
                 bool lastDelimited = t[t.Length - 1] == TokenDelimiter[0];
 
-#if NET48
+#if NETFRAMEWORK
                 string[] tokens = t.Split(new[] { TokenDelimiter }, StringSplitOptions.RemoveEmptyEntries);
 #else
                 string[] tokens = t.Split(TokenDelimiter);
@@ -563,7 +563,11 @@ namespace tokenizingtextbox
             {
                 const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
 
+#if NETSTANDARD2_0
                 ItemCollectionConstructor = ItemCollectionType.GetConstructor(flags, null, new[] { typeof(DependencyObject) }, Array.Empty<ParameterModifier>());
+#else
+                ItemCollectionConstructor = ItemCollectionType.GetConstructor(flags, null, new[] { typeof(DependencyObject) }, new ParameterModifier[0]);
+#endif
                 BeginInitMethod = ItemCollectionType.GetMethod("BeginInit", flags);
                 EndInitMethod = ItemCollectionType.GetMethod("EndInit", flags);
                 ItemsSourceProperty = ItemCollectionType.GetProperty("ItemsSource", flags);
