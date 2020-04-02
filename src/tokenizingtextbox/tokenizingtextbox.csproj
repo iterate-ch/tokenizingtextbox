@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>
-      net4;net45;net47;net48;netcoreapp3.1
-    </TargetFrameworks>
+    <TargetFrameworks>net47</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <Authors>iterate GmbH</Authors>
     <Company>iterate GmbH</Company>
@@ -13,6 +11,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <VersionPrefix>1.0.1</VersionPrefix>
     <VersionSuffix>development</VersionSuffix>
+  
+    <InternalsAssemblyNames>PresentationFramework</InternalsAssemblyNames>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Publicize" Version="1.0.0" />
   </ItemGroup>
 </Project>

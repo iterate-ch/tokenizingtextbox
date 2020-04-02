@@ -1,0 +1,20 @@
+<Project>
+	<Import Project="../Directory.Build.props" />
+
+	<Import Project="$(SolutionDir)sdk\PackageSources.props" />
+
+	<PropertyGroup>
+		<RestoreSources>
+			$(RestoreSources);
+			https://api.nuget.org/v3/index.json
+		</RestoreSources>
+		<RestoreNoCache>true</RestoreNoCache>
+
+		<SrcDir>$(MSBuildThisFileDirectory)</SrcDir>
+		<BaseIntermediateOutputPath>$(SrcDir)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+		<BaseOutputPath>$(SrcDir)bin\$(MSBuildProjectName)</BaseOutputPath>
+		<!--<IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>-->
+		
+		<AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+</Project>

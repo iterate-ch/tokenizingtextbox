@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tokenizingtextbox", "tokenizingtextbox\tokenizingtextbox.csproj", "{7D342AB8-D661-4AD6-9EAD-E10FCEC4CB53}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F81FCA03-99F4-4D27-8993-CF835C1C260D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -14,7 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ThirdPartyNotices.txt = ThirdPartyNotices.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{8EABB178-46B9-452D-9B05-1C06A2881CA6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sdk", "sdk", "{E17EFE1A-B939-4392-8737-F79B55EA0E45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publicize", "sdk\Publicize\Publicize.csproj", "{75B9046B-9033-41BB-BA97-2382B9840163}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D3008FCD-E97F-400F-BAF1-B6C789BFE620}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tokenizingtextbox", "src\tokenizingtextbox\tokenizingtextbox.csproj", "{D7FA08B8-694F-4418-A0B5-D42488802DE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "src\Sample\Sample.csproj", "{656B0532-F207-469C-AFE1-E5F9F5732CB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,19 +28,28 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7D342AB8-D661-4AD6-9EAD-E10FCEC4CB53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D342AB8-D661-4AD6-9EAD-E10FCEC4CB53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D342AB8-D661-4AD6-9EAD-E10FCEC4CB53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D342AB8-D661-4AD6-9EAD-E10FCEC4CB53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8EABB178-46B9-452D-9B05-1C06A2881CA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8EABB178-46B9-452D-9B05-1C06A2881CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8EABB178-46B9-452D-9B05-1C06A2881CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8EABB178-46B9-452D-9B05-1C06A2881CA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75B9046B-9033-41BB-BA97-2382B9840163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75B9046B-9033-41BB-BA97-2382B9840163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75B9046B-9033-41BB-BA97-2382B9840163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75B9046B-9033-41BB-BA97-2382B9840163}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7FA08B8-694F-4418-A0B5-D42488802DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7FA08B8-694F-4418-A0B5-D42488802DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7FA08B8-694F-4418-A0B5-D42488802DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7FA08B8-694F-4418-A0B5-D42488802DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{656B0532-F207-469C-AFE1-E5F9F5732CB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{656B0532-F207-469C-AFE1-E5F9F5732CB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{656B0532-F207-469C-AFE1-E5F9F5732CB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{656B0532-F207-469C-AFE1-E5F9F5732CB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DE1B24BF-44F0-46D6-95FE-04814BA3F778}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{75B9046B-9033-41BB-BA97-2382B9840163} = {E17EFE1A-B939-4392-8737-F79B55EA0E45}
+		{D7FA08B8-694F-4418-A0B5-D42488802DE9} = {D3008FCD-E97F-400F-BAF1-B6C789BFE620}
+		{656B0532-F207-469C-AFE1-E5F9F5732CB2} = {D3008FCD-E97F-400F-BAF1-B6C789BFE620}
 	EndGlobalSection
 EndGlobal

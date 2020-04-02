@@ -1,0 +1,8 @@
+<Project>
+	<Import Project="../Directory.Build.props" />
+
+	<PropertyGroup>
+		<SdkDir>$(MSBuildThisFileDirectory)</SdkDir>
+		<PackageOutputPath>$(SdkDir)packages\</PackageOutputPath>
+	</PropertyGroup>
+</Project>

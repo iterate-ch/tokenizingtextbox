@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace tokenizingtextbox
 {
@@ -125,6 +126,19 @@ namespace tokenizingtextbox
                 double currentV = 0;
                 void arrange(UIElement child, bool isLast = false)
                 {
+                    if (child is FrameworkElement fe && fe.TemplateChild is Panel nestedPanel)
+                    {
+                        if (nestedPanel.Children.Count > 0)
+                        {
+                            var nestedIndex = nestedPanel.Children.Count;
+                            for (var i = 0; i < nestedIndex; i++)
+                            {
+                                arrange(nestedPanel.Children[i], isLast && (nestedIndex - i) == 1);
+                            }
+                        }
+                        return;
+                    }
+
                     var desiredMeasure = new UvMeasure(Orientation, child.DesiredSize.Width, child.DesiredSize.Height);
                     if (desiredMeasure.U == 0)
                     {
@@ -140,7 +154,7 @@ namespace tokenizingtextbox
                     }
 
                     // Stretch the last item to fill the available space
-                    if (isLast)
+                    if (isLast && StretchChild == StretchChild.Last)
                     {
                         desiredMeasure.U = parentMeasure.U - position.U;
                     }
@@ -160,18 +174,16 @@ namespace tokenizingtextbox
                     currentV = Math.Max(desiredMeasure.V, currentV);
                 }
 
-                var lastIndex = Children.Count - 1;
+                var lastIndex = Children.Count;
                 for (var i = 0; i < lastIndex; i++)
                 {
-                    arrange(Children[i]);
+                    arrange(Children[i], (lastIndex - i) == 1);
                 }
-
-                arrange(Children[lastIndex], StretchChild == StretchChild.Last);
             }
 
             return finalSize;
         }
-
+        
         /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -182,50 +194,60 @@ namespace tokenizingtextbox
             var spacingMeasure = new UvMeasure(Orientation, HorizontalSpacing, VerticalSpacing);
             var lineMeasure = UvMeasure.Zero;
 
-            foreach (UIElement child in Children)
+            void measure(UIElementCollection elementCollection)
             {
-                child.Measure(availableSize);
-                var currentMeasure = new UvMeasure(Orientation, child.DesiredSize.Width, child.DesiredSize.Height);
-                if (currentMeasure.U == 0)
+                foreach (UIElement child in elementCollection)
                 {
-                    continue; // ignore collapsed items
-                }
-
-                // if this is the first item, do not add spacing. Spacing is added to the "left"
-                double uChange = lineMeasure.U == 0
-                    ? currentMeasure.U
-                    : currentMeasure.U + spacingMeasure.U;
-                if (parentMeasure.U >= uChange + lineMeasure.U)
-                {
-                    lineMeasure.U += uChange;
-                    lineMeasure.V = Math.Max(lineMeasure.V, currentMeasure.V);
-                }
-                else
-                {
-                    // new line should be added
-                    // to get the max U to provide it correctly to ui width ex: ---| or -----|
-                    totalMeasure.U = Math.Max(lineMeasure.U, totalMeasure.U);
-                    totalMeasure.V += lineMeasure.V + spacingMeasure.V;
-
-                    // if the next new row still can handle more controls
-                    if (parentMeasure.U > currentMeasure.U)
+                    if (child is FrameworkElement fe && fe.TemplateChild is Panel nestedPanel)
                     {
-                        // set lineMeasure initial values to the currentMeasure to be calculated later on the new loop
-                        lineMeasure = currentMeasure;
+                        measure(nestedPanel.Children);
+                        continue;
                     }
 
-                    // the control will take one row alone
+                    child.Measure(availableSize);
+                    var currentMeasure = new UvMeasure(Orientation, child.DesiredSize.Width, child.DesiredSize.Height);
+                    if (currentMeasure.U == 0)
+                    {
+                        continue; // ignore collapsed items
+                    }
+
+                    // if this is the first item, do not add spacing. Spacing is added to the "left"
+                    double uChange = lineMeasure.U == 0
+                        ? currentMeasure.U
+                        : currentMeasure.U + spacingMeasure.U;
+                    if (parentMeasure.U >= uChange + lineMeasure.U)
+                    {
+                        lineMeasure.U += uChange;
+                        lineMeasure.V = Math.Max(lineMeasure.V, currentMeasure.V);
+                    }
                     else
                     {
-                        // validate the new control measures
-                        totalMeasure.U = Math.Max(currentMeasure.U, totalMeasure.U);
-                        totalMeasure.V += currentMeasure.V;
+                        // new line should be added
+                        // to get the max U to provide it correctly to ui width ex: ---| or -----|
+                        totalMeasure.U = Math.Max(lineMeasure.U, totalMeasure.U);
+                        totalMeasure.V += lineMeasure.V + spacingMeasure.V;
 
-                        // add new empty line
-                        lineMeasure = UvMeasure.Zero;
+                        // if the next new row still can handle more controls
+                        if (parentMeasure.U > currentMeasure.U)
+                        {
+                            // set lineMeasure initial values to the currentMeasure to be calculated later on the new loop
+                            lineMeasure = currentMeasure;
+                        }
+
+                        // the control will take one row alone
+                        else
+                        {
+                            // validate the new control measures
+                            totalMeasure.U = Math.Max(currentMeasure.U, totalMeasure.U);
+                            totalMeasure.V += currentMeasure.V;
+
+                            // add new empty line
+                            lineMeasure = UvMeasure.Zero;
+                        }
                     }
                 }
             }
+            measure(Children);
 
             // update value with the last line
             // if the the last loop is(parentMeasure.U > currentMeasure.U + lineMeasure.U) the total isn't calculated then calculate it
