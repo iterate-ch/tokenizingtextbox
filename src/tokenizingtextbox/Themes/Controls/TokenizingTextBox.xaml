@@ -5,6 +5,8 @@
 
     <!--  Default style for TokenizingTextBox  -->
     <Style TargetType="controls:TokenizingTextBox">
+        <Setter Property="Focusable"
+                Value="False" />
         <Setter Property="IsTabStop"
                 Value="False" />
 

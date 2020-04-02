@@ -31,6 +31,9 @@ namespace tokenizingtextbox
         static TokenizingTextBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(typeof(TokenizingTextBox)));
+
+            
+            SelectionModeProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(SelectionMode.Extended));
         }
 
         public bool AcceptsReturn
@@ -65,6 +68,59 @@ namespace tokenizingtextbox
 
                 _textBox.TextChanged += TextBox_TextChanged;
             }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                bool goBack;
+                switch (e.Key)
+                {
+                    case Key.Delete:
+                        goBack = false;
+                        break;
+
+                    case Key.Back:
+                        goBack = true;
+                        break;
+
+                    default:
+                        return;
+                }
+
+                e.Handled = true;
+                int smallestIndex = int.MaxValue;
+                IEditableCollectionView items = Items;
+                using (_selectedItems.DeferRemove())
+                {
+                    foreach (var item in _selectedItems)
+                    {
+                        if (item.Index < smallestIndex)
+                        {
+                            smallestIndex = item.Index;
+                        }
+                        items.RemoveAt(item.Index);
+                    }
+                }
+                items.CommitEdit();
+                _wrapPanel.InvalidateMeasure();
+                if (Items.Count > 0)
+                {
+                    var selectIndex = smallestIndex;
+                    if (goBack)
+                        selectIndex = Math.Max(0, selectIndex - 1);
+
+                    var container = ItemContainerGenerator.ContainerFromIndex(Math.Min(selectIndex, Items.Count - 1));
+                    SetIsSelected(container, true);
+                    ((UIElement)container).Focus();
+                }
+                else
+                {
+                    _textBox.Focus();
+                }
+            }
+            base.OnKeyDown(e);
         }
 
         private void AddToken(string token)
@@ -110,28 +166,6 @@ namespace tokenizingtextbox
                     _textBox.Text = string.Empty;
                 }
             }
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            if (!e.Handled)
-            {
-                if (e.Key == Key.Delete || e.Key == Key.Back)
-                {
-                    e.Handled = true;
-                    IEditableCollectionView items = Items;
-                    using (_selectedItems.DeferRemove())
-                    {
-                        foreach (var item in _selectedItems)
-                        {
-                            items.RemoveAt(item.Index);
-                        }
-                    }
-                    items.CommitEdit();
-                    _wrapPanel.InvalidateMeasure();
-                }
-            }
-            base.OnKeyDown(e);
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
