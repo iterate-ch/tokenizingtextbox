@@ -12,10 +12,20 @@
               Height="450"
               Width="800">
     <DockPanel>
-        <c:TokenizingTextBox x:Name="TextBox"
-                             DockPanel.Dock="Top"
-                             ItemsSource="{Binding Items}"
-                             TokenDelimiter="," />
+        <StackPanel DockPanel.Dock="Top">
+            <c:TokenizingTextBox x:Name="TextBox"
+                                 ItemsSource="{Binding Items}"
+                                 TokenDelimiter="," />
+
+            <c:TokenizingTextBox ItemsSource="{Binding BasicList}"
+                                 TokenDelimiter="," />
+
+            <c:TokenizingTextBox ItemsSource="{Binding ItemSet}"
+                                 TokenDelimiter=","
+                                 AcceptTokenCommand="{Binding AcceptTokenCommand}"
+                                 DeleteTokenCommand="{Binding RemoveTokenCommand}" />
+        </StackPanel>
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
