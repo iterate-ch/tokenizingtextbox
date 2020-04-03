@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,12 @@ namespace tokenizingtextbox
             typeof(TokenizingTextBox),
             new PropertyMetadata(true));
 
+        public static readonly DependencyProperty AcceptTokenCommandProperty =
+            DependencyProperty.Register(nameof(AcceptTokenCommand), typeof(ICommand), typeof(TokenizingTextBox));
+
+        public static readonly DependencyProperty DeleteTokenCommandProperty =
+            DependencyProperty.Register(nameof(DeleteTokenCommand), typeof(ICommand), typeof(TokenizingTextBox));
+
         public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register(
             nameof(TokenDelimiter),
             typeof(string),
@@ -23,16 +30,17 @@ namespace tokenizingtextbox
             new PropertyMetadata(" "));
 
         private const string PART_TextBox = "PART_TextBox";
+
         private const string PART_WrapPanel = "PART_WrapPanel";
 
         private TextBox _textBox;
+
         private WrapPanel _wrapPanel;
 
         static TokenizingTextBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(typeof(TokenizingTextBox)));
 
-            
             SelectionModeProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(SelectionMode.Extended));
         }
 
@@ -40,6 +48,18 @@ namespace tokenizingtextbox
         {
             get { return (bool)GetValue(AcceptsReturnProperty); }
             set { SetValue(AcceptsReturnProperty, value); }
+        }
+
+        public ICommand AcceptTokenCommand
+        {
+            get { return (ICommand)GetValue(AcceptTokenCommandProperty); }
+            set { SetValue(AcceptTokenCommandProperty, value); }
+        }
+
+        public ICommand DeleteTokenCommand
+        {
+            get { return (ICommand)GetValue(DeleteTokenCommandProperty); }
+            set { SetValue(DeleteTokenCommandProperty, value); }
         }
 
         public string TokenDelimiter
@@ -100,18 +120,32 @@ namespace tokenizingtextbox
                         {
                             smallestIndex = item.Index;
                         }
-                        items.RemoveAt(item.Index);
+                        if (items.CanRemove)
+                        {
+                            items.RemoveAt(item.Index);
+                        }
+                        else if (Items.SourceCollection is IList list && !(list.IsFixedSize || list.IsReadOnly))
+                        {
+                            list.RemoveAt(item.Index);
+                        }
+                        else if (DeleteTokenCommand?.CanExecute(item.Item) ?? false)
+                        {
+                            DeleteTokenCommand.Execute(item.Item);
+                        }
                     }
+                    if (items.CanRemove)
+                    {
+                        items.CommitEdit();
+                    }
+                    SelectedItemsImpl.Clear();
                 }
-                items.CommitEdit();
-                _wrapPanel.InvalidateMeasure();
                 if (Items.Count > 0)
                 {
                     var selectIndex = smallestIndex;
                     if (goBack)
                         selectIndex = Math.Max(0, selectIndex - 1);
 
-                    var container = ItemContainerGenerator.ContainerFromIndex(Math.Min(selectIndex, Items.Count - 1));
+                    var container = ItemInfoFromIndex(selectIndex).Container;
                     SetIsSelected(container, true);
                     ((UIElement)container).Focus();
                 }
@@ -130,8 +164,20 @@ namespace tokenizingtextbox
             if (token.Length > 0)
             {
                 IEditableCollectionViewAddNewItem items = Items;
-                items.AddNewItem(token);
-                items.CommitNew();
+                if (items.CanAddNewItem)
+                {
+                    items.AddNewItem(token);
+                    items.CommitNew();
+                }
+                else if (Items.SourceCollection is IList list && !(list.IsFixedSize || list.IsReadOnly))
+                {
+                    list.Add(token);
+                }
+                else if (AcceptTokenCommand?.CanExecute(token) ?? false)
+                {
+                    AcceptTokenCommand.Execute(token);
+                }
+                Items.RefreshInternal();
             }
         }
 
@@ -185,7 +231,7 @@ namespace tokenizingtextbox
                 if (lastDelimited)
                 {
                     _textBox.Text = string.Empty;
-                    _wrapPanel.InvalidateMeasure();
+                    //_wrapPanel.InvalidateMeasure();
                 }
                 else
                 {
