@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+    <_P_TaskAssembly>$(MSBuildThisFileDirectory)..\tools\Publicize.dll</_P_TaskAssembly>
+  </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(_P_TaskAssembly)" TaskName="Publicize.Publicize" />
+
+  <Target Name="PublicizeInternals" AfterTargets="AfterResolveReferences">
+    <Publicize SourceReferences="@(ReferencePath)" AssemblyNames="$(InternalsAssemblyNames)" IntermediateOutputPath="$(IntermediateOutputPath)">
+      <Output ItemName="ReferencePath" TaskParameter="TargetReferences" />
+      <Output ItemName="_P_RemovedReferences" TaskParameter="RemovedReferences" />
+      <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
+    </Publicize>
+    <ItemGroup>
+      <ReferencePath Remove="@(_P_RemovedReferences)" />
+    </ItemGroup>
+  </Target>
+</Project>
