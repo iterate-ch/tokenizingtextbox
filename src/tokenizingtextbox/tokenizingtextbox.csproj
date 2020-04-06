@@ -9,7 +9,7 @@
     <Copyright>iterate GmbH</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>2.0.0</VersionPrefix>
     <VersionSuffix>development</VersionSuffix>
 
     <InternalsAssemblyNames>PresentationFramework</InternalsAssemblyNames>
