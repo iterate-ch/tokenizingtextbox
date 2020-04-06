@@ -11,38 +11,29 @@ namespace tokenizingtextbox
     [TemplatePart(Name = PART_WrapPanel, Type = typeof(Panel))]
     public class TokenizingTextBox : ListBox
     {
-        public static readonly DependencyProperty AcceptsReturnProperty = DependencyProperty.Register(
-            nameof(AcceptsReturn),
-            typeof(bool),
-            typeof(TokenizingTextBox),
-            new PropertyMetadata(true));
+        #region Dependency Properties
 
-        public static readonly DependencyProperty AcceptTokenCommandProperty =
-            DependencyProperty.Register(nameof(AcceptTokenCommand), typeof(ICommand), typeof(TokenizingTextBox));
+        #region Property Keys
 
-        public static readonly DependencyProperty DeleteTokenCommandProperty =
-            DependencyProperty.Register(nameof(DeleteTokenCommand), typeof(ICommand), typeof(TokenizingTextBox));
+        private static readonly DependencyPropertyKey CanUserAddPropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanUserAdd), typeof(bool), typeof(TokenizingTextBox), null);
+        private static readonly DependencyPropertyKey CanUserRemovePropertyKey = DependencyProperty.RegisterReadOnly(nameof(CanUserRemove), typeof(bool), typeof(TokenizingTextBox), null);
 
+        #endregion Property Keys
+
+        #region Properties
+
+        public static readonly DependencyProperty AcceptsReturnProperty = KeyboardNavigation.AcceptsReturnProperty.AddOwner(typeof(TokenizingTextBox));
+        public static readonly DependencyProperty CanUserAddProperty = CanUserAddPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty CanUserRemoveProperty = CanUserRemovePropertyKey.DependencyProperty;
         public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register(
             nameof(TokenDelimiter),
             typeof(string),
             typeof(TokenizingTextBox),
             new PropertyMetadata(" "));
 
-        private const string PART_TextBox = "PART_TextBox";
+        #endregion Properties
 
-        private const string PART_WrapPanel = "PART_WrapPanel";
-
-        private TextBox _textBox;
-
-        private WrapPanel _wrapPanel;
-
-        static TokenizingTextBox()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(typeof(TokenizingTextBox)));
-
-            SelectionModeProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(SelectionMode.Extended));
-        }
+        #region Accessors
 
         public bool AcceptsReturn
         {
@@ -50,22 +41,30 @@ namespace tokenizingtextbox
             set { SetValue(AcceptsReturnProperty, value); }
         }
 
-        public ICommand AcceptTokenCommand
-        {
-            get { return (ICommand)GetValue(AcceptTokenCommandProperty); }
-            set { SetValue(AcceptTokenCommandProperty, value); }
-        }
+        public bool CanUserAdd => (bool)GetValue(CanUserAddProperty);
 
-        public ICommand DeleteTokenCommand
-        {
-            get { return (ICommand)GetValue(DeleteTokenCommandProperty); }
-            set { SetValue(DeleteTokenCommandProperty, value); }
-        }
+        public bool CanUserRemove => (bool)GetValue(CanUserRemoveProperty);
 
         public string TokenDelimiter
         {
             get => (string)GetValue(TokenDelimiterProperty);
             set => SetValue(TokenDelimiterProperty, value);
+        }
+
+        #endregion Accessors
+
+        #endregion Dependency Properties
+
+        private const string PART_TextBox = "PART_TextBox";
+        private const string PART_WrapPanel = "PART_WrapPanel";
+        private TextBox _textBox;
+        private WrapPanel _wrapPanel;
+
+        static TokenizingTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(typeof(TokenizingTextBox)));
+
+            SelectionModeProperty.OverrideMetadata(typeof(TokenizingTextBox), new FrameworkPropertyMetadata(SelectionMode.Extended));
         }
 
         public override void OnApplyTemplate()
@@ -90,6 +89,15 @@ namespace tokenizingtextbox
             }
         }
 
+        protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
+        {
+            base.OnItemsSourceChanged(oldValue, newValue);
+
+            IEditableCollectionViewAddNewItem view = Items;
+            SetValue(CanUserAddPropertyKey, view.CanAddNewItem);
+            SetValue(CanUserRemovePropertyKey, view.CanRemove);
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (!e.Handled)
@@ -110,6 +118,10 @@ namespace tokenizingtextbox
                 }
 
                 e.Handled = true;
+                if (!CanUserRemove)
+                {
+                    return;
+                }
                 int smallestIndex = int.MaxValue;
                 IEditableCollectionView items = Items;
                 using (_selectedItems.DeferRemove())
@@ -120,22 +132,7 @@ namespace tokenizingtextbox
                         {
                             smallestIndex = item.Index;
                         }
-                        if (items.CanRemove)
-                        {
-                            items.RemoveAt(item.Index);
-                        }
-                        else if (Items.SourceCollection is IList list && !(list.IsFixedSize || list.IsReadOnly))
-                        {
-                            list.RemoveAt(item.Index);
-                        }
-                        else if (DeleteTokenCommand?.CanExecute(item.Item) ?? false)
-                        {
-                            DeleteTokenCommand.Execute(item.Item);
-                        }
-                    }
-                    if (items.CanRemove)
-                    {
-                        items.CommitEdit();
+                        items.RemoveAt(item.Index);
                     }
                     SelectedItemsImpl.Clear();
                 }
@@ -164,20 +161,8 @@ namespace tokenizingtextbox
             if (token.Length > 0)
             {
                 IEditableCollectionViewAddNewItem items = Items;
-                if (items.CanAddNewItem)
-                {
-                    items.AddNewItem(token);
-                    items.CommitNew();
-                }
-                else if (Items.SourceCollection is IList list && !(list.IsFixedSize || list.IsReadOnly))
-                {
-                    list.Add(token);
-                }
-                else if (AcceptTokenCommand?.CanExecute(token) ?? false)
-                {
-                    AcceptTokenCommand.Execute(token);
-                }
-                Items.RefreshInternal();
+                items.AddNewItem(token);
+                items.CommitNew();
             }
         }
 

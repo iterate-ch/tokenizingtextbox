@@ -31,7 +31,8 @@
                                      BorderThickness="0,0,0,1"
                                      Padding="0,2"
                                      VerticalContentAlignment="Center"
-                                     MinHeight="25" />
+                                     MinHeight="25"
+                                     IsEnabled="{TemplateBinding CanUserAdd}" />
                         </controls:WrapPanel>
 
                         <VisualStateManager.VisualStateGroups>
