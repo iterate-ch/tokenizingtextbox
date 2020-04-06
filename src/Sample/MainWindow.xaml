@@ -1,7 +1,6 @@
 ﻿<catel:Window xmlns:catel="http://schemas.catelproject.com"
               xmlns:c="http://iterate.ch/controls"
-              x:Class="
-              Sample.MainWindow"
+              x:Class="Sample.MainWindow"
               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,19 +11,11 @@
               Height="450"
               Width="800">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top">
-            <c:TokenizingTextBox x:Name="TextBox"
-                                 ItemsSource="{Binding Items}"
-                                 TokenDelimiter="," />
-
-            <c:TokenizingTextBox ItemsSource="{Binding BasicList}"
-                                 TokenDelimiter="," />
-
-            <c:TokenizingTextBox ItemsSource="{Binding ItemSet}"
-                                 TokenDelimiter=","
-                                 AcceptTokenCommand="{Binding AcceptTokenCommand}"
-                                 DeleteTokenCommand="{Binding RemoveTokenCommand}" />
-        </StackPanel>
+        <c:TokenizingTextBox x:Name="TextBox"
+                             DockPanel.Dock="Top"
+                             ItemsSource="{Binding Labels}"
+                             AcceptsReturn="True"
+                             TokenDelimiter="," />
 
         <Grid>
             <Grid.ColumnDefinitions>
@@ -33,7 +24,7 @@
             </Grid.ColumnDefinitions>
 
             <ListBox Grid.Column="0"
-                     ItemsSource="{Binding Items}" />
+                     ItemsSource="{Binding Labels}" />
             <ListBox Grid.Column="1"
                      ItemsSource="{Binding SelectedItems, ElementName=TextBox}" />
         </Grid>

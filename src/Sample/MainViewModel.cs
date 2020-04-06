@@ -1,36 +1,38 @@
 ﻿using Catel.MVVM;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
+using System.Collections.Specialized;
 
 namespace Sample
 {
     public class MainViewModel : ViewModelBase
     {
-        public MainViewModel()
+        public ICollection<string> Labels { get; } = new LabelCollection();
+
+        private class LabelCollection : KeyedCollection<string, string>, INotifyCollectionChanged
         {
-            AcceptTokenCommand = new Command<string>(AddToken);
-            RemoveTokenCommand = new Command<string>(RemoveToken);
-        }
+            public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public ICommand AcceptTokenCommand { get; }
+            protected override void ClearItems()
+            {
+                base.ClearItems();
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
 
-        public List<string> BasicList { get; private set; } = new List<string>();
+            protected override string GetKeyForItem(string item) => item;
 
-        public ObservableCollection<string> Items { get; private set; } = new ObservableCollection<string>();
+            protected override void InsertItem(int index, string item)
+            {
+                base.InsertItem(index, item);
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            }
 
-        public HashSet<string> ItemSet { get; private set; } = new HashSet<string>();
-
-        public ICommand RemoveTokenCommand { get; }
-
-        private void AddToken(string token)
-        {
-            ItemSet.Add(token);
-        }
-
-        private void RemoveToken(string token)
-        {
-            ItemSet.Remove(token);
+            protected override void RemoveItem(int index)
+            {
+                var item = GetKeyForItem(Items[index]);
+                base.RemoveItem(index);
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+            }
         }
     }
 }
