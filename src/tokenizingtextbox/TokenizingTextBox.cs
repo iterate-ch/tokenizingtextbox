@@ -141,6 +141,7 @@ namespace tokenizingtextbox
                     var selectIndex = smallestIndex;
                     if (goBack)
                         selectIndex = Math.Max(0, selectIndex - 1);
+                    selectIndex = Math.Min(selectIndex, Items.Count - 1);
 
                     var container = ItemInfoFromIndex(selectIndex).Container;
                     SetIsSelected(container, true);
