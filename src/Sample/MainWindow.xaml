@@ -15,6 +15,7 @@
                              DockPanel.Dock="Top"
                              ItemsSource="{Binding Labels}"
                              AcceptsReturn="True"
+                             AcceptsTab="True"
                              TokenDelimiter="," />
 
         <Grid>
