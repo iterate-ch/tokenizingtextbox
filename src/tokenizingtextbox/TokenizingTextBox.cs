@@ -89,6 +89,8 @@ namespace tokenizingtextbox
             }
         }
 
+        protected override DependencyObject GetContainerForItemOverride() => new TokenizingTextBoxItem();
+
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
             base.OnItemsSourceChanged(oldValue, newValue);
