@@ -23,6 +23,8 @@ namespace tokenizingtextbox
         #region Properties
 
         public static readonly DependencyProperty AcceptsReturnProperty = KeyboardNavigation.AcceptsReturnProperty.AddOwner(typeof(TokenizingTextBox));
+        public static readonly DependencyProperty AcceptsTabProperty = DependencyProperty.Register("AcceptsTab", typeof(bool), typeof(TokenizingTextBox));
+        public static readonly DependencyProperty AddOnFocusLostProperty = DependencyProperty.Register("AddOnFocusLost", typeof(bool), typeof(TokenizingTextBox));
         public static readonly DependencyProperty CanUserAddProperty = CanUserAddPropertyKey.DependencyProperty;
         public static readonly DependencyProperty CanUserRemoveProperty = CanUserRemovePropertyKey.DependencyProperty;
         public static readonly DependencyProperty TokenDelimiterProperty = DependencyProperty.Register(
@@ -39,6 +41,18 @@ namespace tokenizingtextbox
         {
             get { return (bool)GetValue(AcceptsReturnProperty); }
             set { SetValue(AcceptsReturnProperty, value); }
+        }
+
+        public bool AcceptsTab
+        {
+            get { return (bool)GetValue(AcceptsTabProperty); }
+            set { SetValue(AcceptsTabProperty, value); }
+        }
+
+        public bool AddOnFocusLost
+        {
+            get { return (bool)GetValue(AddOnFocusLostProperty); }
+            set { SetValue(AddOnFocusLostProperty, value); }
         }
 
         public bool CanUserAdd => (bool)GetValue(CanUserAddProperty);
@@ -76,6 +90,8 @@ namespace tokenizingtextbox
                 _textBox.Loaded -= OnASBLoaded;
 
                 _textBox.TextChanged -= TextBox_TextChanged;
+                _textBox.GotKeyboardFocus -= TextBox_GotKeyboardFocus;
+                _textBox.LostKeyboardFocus -= TextBox_LostKeyboardFocus;
             }
 
             _textBox = (TextBox)GetTemplateChild(PART_TextBox);
@@ -86,6 +102,7 @@ namespace tokenizingtextbox
                 _textBox.Loaded += OnASBLoaded;
 
                 _textBox.TextChanged += TextBox_TextChanged;
+                _textBox.GotKeyboardFocus += TextBox_GotKeyboardFocus;
             }
         }
 
@@ -179,26 +196,38 @@ namespace tokenizingtextbox
             _textBox.PreviewKeyDown += this.TextBox_PreviewKeyDown;
         }
 
+        private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _textBox.GotKeyboardFocus -= TextBox_GotKeyboardFocus;
+            _textBox.LostKeyboardFocus += TextBox_LostKeyboardFocus;
+        }
+
+        private void TextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _textBox.LostKeyboardFocus -= TextBox_LostKeyboardFocus;
+            _textBox.GotKeyboardFocus += TextBox_GotKeyboardFocus;
+            if (AddOnFocusLost)
+            {
+                AddToken(_textBox.Text);
+                _textBox.Text = string.Empty;
+            }
+        }
+
         private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             int currentCursorPosition = _textBox.SelectionStart;
-            if (currentCursorPosition == 0 && _textBox.SelectionLength == 0 && e.Key == Key.Back && Items.Count > 0)
+            switch (e.Key)
             {
-                e.Handled = true;
-                var container = ItemContainerGenerator.ContainerFromIndex(Items.Count - 1);
-                if (container is IInputElement element)
-                {
-                    Keyboard.Focus(element);
-                }
-            }
-            else if (e.Key == Key.Enter)
-            {
-                e.Handled = true;
-                if (AcceptsReturn)
-                {
-                    AddToken(_textBox.Text);
+                case Key.Back when currentCursorPosition == 0 && _textBox.SelectionLength == 0 && Items.Count > 0:
+                    e.Handled = true;
+                    break;
+
+                case Key.Enter when AcceptsReturn:
+                case Key.Tab when AcceptsTab:
+                    e.Handled = true;
+                    AddText(_textBox.Text);
                     _textBox.Text = string.Empty;
-                }
+                    break;
             }
         }
 
