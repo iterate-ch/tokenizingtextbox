@@ -10,7 +10,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <VersionPrefix>2.1.1</VersionPrefix>
-    <VersionSuffix>development</VersionSuffix>
+    <VersionSuffix></VersionSuffix>
 
     <InternalsAssemblyNames>PresentationFramework</InternalsAssemblyNames>
   </PropertyGroup>
