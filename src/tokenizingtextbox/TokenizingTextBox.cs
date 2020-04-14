@@ -216,14 +216,20 @@ namespace tokenizingtextbox
         private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             int currentCursorPosition = _textBox.SelectionStart;
+            var isEmpty = string.IsNullOrWhiteSpace(_textBox.Text);
             switch (e.Key)
             {
                 case Key.Back when currentCursorPosition == 0 && _textBox.SelectionLength == 0 && Items.Count > 0:
                     e.Handled = true;
+                    var container = ItemContainerGenerator.ContainerFromIndex(Items.Count - 1);
+                    if (container is IInputElement element)
+                    {
+                        Keyboard.Focus(element);
+                    }
                     break;
 
-                case Key.Enter when AcceptsReturn:
-                case Key.Tab when AcceptsTab:
+                case Key.Enter when AcceptsReturn && !isEmpty:
+                case Key.Tab when AcceptsTab && !isEmpty:
                     e.Handled = true;
                     AddText(_textBox.Text);
                     _textBox.Text = string.Empty;
