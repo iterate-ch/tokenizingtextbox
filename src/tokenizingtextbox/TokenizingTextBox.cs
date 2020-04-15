@@ -186,6 +186,13 @@ namespace tokenizingtextbox
             }
         }
 
+        private void AddToken()
+        {
+            var text = _textBox.Text;
+            _textBox.Text = string.Empty;
+            AddToken(text);
+        }
+
         private void OnASBLoaded(object sender, RoutedEventArgs e)
         {
             if (_textBox != null)
@@ -208,8 +215,7 @@ namespace tokenizingtextbox
             _textBox.GotKeyboardFocus += TextBox_GotKeyboardFocus;
             if (AddOnFocusLost)
             {
-                AddToken(_textBox.Text);
-                _textBox.Text = string.Empty;
+                AddToken();
             }
         }
 
@@ -231,8 +237,7 @@ namespace tokenizingtextbox
                 case Key.Enter when AcceptsReturn && !isEmpty:
                 case Key.Tab when AcceptsTab && !isEmpty:
                     e.Handled = true;
-                    AddText(_textBox.Text);
-                    _textBox.Text = string.Empty;
+                    AddToken();
                     break;
             }
         }
